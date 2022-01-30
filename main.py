@@ -4,6 +4,7 @@ import pandas as pd
 class ResultsSerializer():
     input_type = ''
     is_male_competition = True
+    competiton_data: pd.DataFrame
 
     def __init__(
         self, input_type: str, is_male_competition: bool = True
@@ -12,11 +13,12 @@ class ResultsSerializer():
         self.is_male_competition = is_male_competition
 
     def main(self) -> None:
-        raw_data = self.get_data()
+        self.get_data()
+        self.calculate_results()
 
-        calculated_results = self.calculate_results(raw_data)
+    def get_data(self, path: str = 'Decathlon.csv') -> None:
 
-    def get_data(self, path: str = 'Decathlon.csv') -> pd.DataFrame:
+        # mens and womans competition have different events and order
         if self.input_type == 'csv':
             header_names = (
                 'full_name',
@@ -44,42 +46,81 @@ class ResultsSerializer():
                 '1500_metres'
             )
 
-            raw_data = pd.read_csv(
-                path, delimiter=';', header=0, names=header_names
+            self.competiton_data = pd.read_csv(
+                path, delimiter=';', names=header_names
             )
 
-            return raw_data
-
-    def validate_data(self, data: pd.DataFrame):
+    def validate_data(self) -> None:
         pass
 
-    def calculate_results(self, data: pd.DataFrame) -> pd.DataFrame:
+    def calculate_results(self) -> None:
         POINTS_SYSTEM = {
-            '100_metres': {'A': 25.4347, 'B': 18, 'C': 1.81, 'event': 'track'},
-            'long_jump': {'A': 0.14354, 'B': 220, 'C': 1.4, 'event': 'field'},
-            'shot_put': {'A': 51.39, 'B': 1.5, 'C': 1.05, 'event': 'field'},
-            'high_jump': {'A': 0.8465, 'B': 75, 'C': 1.42, 'event': 'field'},
-            '400_metres': {'A': 1.53775, 'B': 82, 'C': 1.81, 'event': 'track'},
+            '100_metres': {'A': 25.4347, 'B': 18, 'C': 1.81, 'event': 'track',
+                           'convert_units': False},
+            'long_jump': {'A': 0.14354, 'B': 220, 'C': 1.4, 'event': 'field',
+                          'convert_units': True},
+            'shot_put': {'A': 51.39, 'B': 1.5, 'C': 1.05, 'event': 'field',
+                         'convert_units': False},
+            'high_jump': {'A': 0.8465, 'B': 75, 'C': 1.42, 'event': 'field',
+                          'convert_units': True},
+            '400_metres': {'A': 1.53775, 'B': 82, 'C': 1.81, 'event': 'track',
+                           'convert_units': False},
             '110_metres_hurdles': {'A': 5.74352, 'B': 28.5, 'C': 1.92,
-                                   'event': 'track'},
+                                   'event': 'track', 'convert_units': False},
             '100_metres_hurdles': {'A': 5.74352, 'B': 28.5, 'C': 1.92,
-                                   'event': 'track'},
-            'discus_throw': {'A': 12.91, 'B': 4, 'C': 1.1, 'event': 'field'},
-            'pole_vault': {'A': 0.2797, 'B': 100, 'C': 1.35, 'event': 'field'},
-            'javelin_throw': {'A': 10.14, 'B': 7, 'C': 1.08, 'event': 'field'},
+                                   'event': 'track', 'convert_units': False},
+            'discus_throw': {'A': 12.91, 'B': 4, 'C': 1.1, 'event': 'field',
+                             'convert_units': False},
+            'pole_vault': {'A': 0.2797, 'B': 100, 'C': 1.35, 'event': 'field',
+                           'convert_units': True},
+            'javelin_throw': {'A': 10.14, 'B': 7, 'C': 1.08, 'event': 'field',
+                              'convert_units': False},
             '1500_metres': {'A': 0.03768, 'B': 480, 'C': 1.85,
-                            'event': 'track'}
+                            'event': 'track', 'convert_units': True}
         }
 
-        total_points = 0
+        self.competiton_data['points'] = 0
+        some = self.competiton_data['1500_metres']
 
-        for key in data.keys():
+        # and adding total points for all other events
+        for event_name in self.competiton_data.keys():
+            event_vars = POINTS_SYSTEM.get(event_name)
 
+            # skip non event columns
+            if not event_vars:
+                continue
 
-    def order_results(self, data: pd.DataFrame) -> pd.DataFrame:
+            # use track event formula to calculate points
+            if event_vars['event'] == 'track':
+                # some events results have to be converted to s
+                event_results = self.competiton_data[event_name] * 100 \
+                    if event_vars['convert_units'] \
+                    else self.competiton_data[event_name]
+
+                self.competiton_data['points'] += (
+                    event_vars['A'] *
+                    (event_vars['B'] - event_results) **
+                    event_vars['C']
+                ).astype(int)
+            # use field event formula to calculate points
+            elif event_vars['event'] == 'field':
+                # some events results have to be converted to cm
+                event_results = self.competiton_data[event_name] * 100 \
+                    if event_vars['convert_units'] \
+                    else self.competiton_data[event_name]
+
+                self.competiton_data['points'] += (
+                    event_vars['A'] *
+                    (event_results - event_vars['B']) **
+                    event_vars['C']
+                ).astype(int)
+
+            print(self.competiton_data)
+
+    def order_results(self) -> None:
         pass
 
-    def export_results(self, data: pd.DataFrame):
+    def export_results(self) -> None:
         pass
 
 
