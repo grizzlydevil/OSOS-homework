@@ -12,7 +12,52 @@
         "javelin_throw": "35.81",
         "1500_metres": "5.25.72",
         "points": 4200,
-        "position": "1"
+        "position": "1-4"
+    },
+    {
+        "full_name": "asdEdan Daniele",
+        "100_metres": "12.61",
+        "long_jump": "5.00",
+        "shot_put": "9.22",
+        "high_jump": "1.50",
+        "400_metres": "60.39",
+        "110_metres_hurdles": "16.43",
+        "discus_throw": "21.60",
+        "pole_vault": "2.60",
+        "javelin_throw": "35.81",
+        "1500_metres": "5.25.72",
+        "points": 4200,
+        "position": "1-4"
+    },
+    {
+        "full_name": "Edaasdn Daniele",
+        "100_metres": "12.61",
+        "long_jump": "5.00",
+        "shot_put": "9.22",
+        "high_jump": "1.50",
+        "400_metres": "60.39",
+        "110_metres_hurdles": "16.43",
+        "discus_throw": "21.60",
+        "pole_vault": "2.60",
+        "javelin_throw": "35.81",
+        "1500_metres": "5.25.72",
+        "points": 4200,
+        "position": "1-4"
+    },
+    {
+        "full_name": "Edan Dhdfaniele",
+        "100_metres": "12.61",
+        "long_jump": "5.00",
+        "shot_put": "9.22",
+        "high_jump": "1.50",
+        "400_metres": "60.39",
+        "110_metres_hurdles": "16.43",
+        "discus_throw": "21.60",
+        "pole_vault": "2.60",
+        "javelin_throw": "35.81",
+        "1500_metres": "5.25.72",
+        "points": 4200,
+        "position": "1-4"
     },
     {
         "full_name": "Coos Kwesi",
@@ -27,7 +72,7 @@
         "javelin_throw": "33.88",
         "1500_metres": "6.22.75",
         "points": 3494,
-        "position": "2"
+        "position": "5"
     },
     {
         "full_name": "Lehi Poghos",
@@ -42,7 +87,52 @@
         "javelin_throw": "28.20",
         "1500_metres": "6.50.76",
         "points": 3199,
-        "position": "3"
+        "position": "6-9"
+    },
+    {
+        "full_name": "Lehi Psdfgoghos",
+        "100_metres": "13.04",
+        "long_jump": "4.53",
+        "shot_put": "7.79",
+        "high_jump": "1.55",
+        "400_metres": "64.72",
+        "110_metres_hurdles": "18.74",
+        "discus_throw": "24.20",
+        "pole_vault": "2.40",
+        "javelin_throw": "28.20",
+        "1500_metres": "6.50.76",
+        "points": 3199,
+        "position": "6-9"
+    },
+    {
+        "full_name": "LehAS Poghos",
+        "100_metres": "13.04",
+        "long_jump": "4.53",
+        "shot_put": "7.79",
+        "high_jump": "1.55",
+        "400_metres": "64.72",
+        "110_metres_hurdles": "18.74",
+        "discus_throw": "24.20",
+        "pole_vault": "2.40",
+        "javelin_throw": "28.20",
+        "1500_metres": "6.50.76",
+        "points": 3199,
+        "position": "6-9"
+    },
+    {
+        "full_name": "Lehiasd Poghos",
+        "100_metres": "13.04",
+        "long_jump": "4.53",
+        "shot_put": "7.79",
+        "high_jump": "1.55",
+        "400_metres": "64.72",
+        "110_metres_hurdles": "18.74",
+        "discus_throw": "24.20",
+        "pole_vault": "2.40",
+        "javelin_throw": "28.20",
+        "1500_metres": "6.50.76",
+        "points": 3199,
+        "position": "6-9"
     },
     {
         "full_name": "Severi Eileifr",
@@ -57,6 +147,21 @@
         "javelin_throw": "33.48",
         "1500_metres": "6.51.01",
         "points": 3099,
-        "position": "4"
+        "position": "10-11"
+    },
+    {
+        "full_name": "Severi Eiaaleifr",
+        "100_metres": "13.43",
+        "long_jump": "4.35",
+        "shot_put": "8.64",
+        "high_jump": "1.50",
+        "400_metres": "66.06",
+        "110_metres_hurdles": "19.05",
+        "discus_throw": "24.89",
+        "pole_vault": "2.20",
+        "javelin_throw": "33.48",
+        "1500_metres": "6.51.01",
+        "points": 3099,
+        "position": "10-11"
     }
 ]

@@ -13,11 +13,11 @@ class ResultsSerializer():
         self.input_type = input_type
         self.is_male_competition = is_male_competition
 
-    def main(self) -> None:
+    def defaultCSV(self) -> None:
         self.get_data()
         self.calculate_results()
         self.order_and_evaluate_results()
-        self.export_results()
+        self.export_to_json()
 
     def get_data(self, path: str = 'Decathlon.csv') -> None:
 
@@ -140,29 +140,26 @@ class ResultsSerializer():
         # evaluate won positions
         list_of_points = list(map(lambda x: x['points'], self.competiton_data))
         for index, competitor in enumerate(self.competiton_data):
-
-            # last competitor who has same amount of points
-            last_same_points = len(list_of_points) - 1 -\
-                list_of_points[::-1].index(competitor['points'])
-
             # only one competitor takes this place
-            if last_same_points == index:
+            if list_of_points.count(competitor['points']) == 1:
                 competitor['position'] = str(index + 1)
-            # assign multiple positions
+            # assign multiple positions to competitors with same results
             else:
-                competitor['position'] =\
-                    f'{list_of_points.index(competitor["points"]) + 1}-'\
-                    f'{last_same_points + 1}'
+                # first competitor place who has same amount of points
+                first_same_points = list_of_points.index(competitor["points"])
+                # last competitor place who has same amount of points
+                last_same_points = len(list_of_points) -\
+                    list_of_points[::-1].index(competitor['points'])
 
-    def export_results(self) -> None:
+                competitor['position'] = f'{first_same_points + 1}-' +\
+                    f'{last_same_points}'
+
+    def export_to_json(self) -> None:
         jsonified_results = json.dumps(self.competiton_data, indent=4)
 
-        self.write_to_file(jsonified_results)
-
-    def write_to_file(self, text: str) -> None:
         with open('results.json', 'w') as file:
-            file.write(text)
+            file.write(jsonified_results)
 
 
 if __name__ == '__main__':
-    ResultsSerializer(input_type='csv').main()
+    ResultsSerializer(input_type='csv').defaultCSV()
