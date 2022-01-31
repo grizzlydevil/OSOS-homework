@@ -1,10 +1,11 @@
-import pandas as pd
+import csv
+import json
 
 
 class ResultsSerializer():
     input_type = ''
     is_male_competition = True
-    competiton_data: pd.DataFrame
+    competiton_data = {}
 
     def __init__(
         self, input_type: str, is_male_competition: bool = True
@@ -15,6 +16,8 @@ class ResultsSerializer():
     def main(self) -> None:
         self.get_data()
         self.calculate_results()
+        self.order_and_evaluate_results()
+        self.export_results()
 
     def get_data(self, path: str = 'Decathlon.csv') -> None:
 
@@ -46,9 +49,12 @@ class ResultsSerializer():
                 '1500_metres'
             )
 
-            self.competiton_data = pd.read_csv(
-                path, delimiter=';', names=header_names
-            )
+            with open(path, mode='r') as file:
+                reader = csv.DictReader(
+                    file, fieldnames=header_names, delimiter=';'
+                )
+
+                self.competiton_data = [row for row in reader]
 
     def validate_data(self) -> None:
         pass
@@ -79,49 +85,83 @@ class ResultsSerializer():
                             'event': 'track', 'convert_units': True}
         }
 
-        self.competiton_data['points'] = 0
-        some = self.competiton_data['1500_metres']
+        # loop over contestants
+        for contestant in self.competiton_data:
+            contestant['points'] = 0
 
-        # and adding total points for all other events
-        for event_name in self.competiton_data.keys():
-            event_vars = POINTS_SYSTEM.get(event_name)
+            # loop over events
+            for event_name in contestant.keys():
+                event_vars = POINTS_SYSTEM.get(event_name)
 
-            # skip non event columns
-            if not event_vars:
-                continue
+                # skip non event columns
+                if not event_vars:
+                    continue
 
-            # use track event formula to calculate points
-            if event_vars['event'] == 'track':
-                # some events results have to be converted to s
-                event_results = self.competiton_data[event_name] * 100 \
-                    if event_vars['convert_units'] \
-                    else self.competiton_data[event_name]
+                # skip this event if the result is 0 or empty
+                if not contestant[event_name]:
+                    continue
 
-                self.competiton_data['points'] += (
-                    event_vars['A'] *
-                    (event_vars['B'] - event_results) **
-                    event_vars['C']
-                ).astype(int)
-            # use field event formula to calculate points
-            elif event_vars['event'] == 'field':
-                # some events results have to be converted to cm
-                event_results = self.competiton_data[event_name] * 100 \
-                    if event_vars['convert_units'] \
-                    else self.competiton_data[event_name]
+                # use track event formula to calculate points
+                if event_vars['event'] == 'track':
 
-                self.competiton_data['points'] += (
-                    event_vars['A'] *
-                    (event_results - event_vars['B']) **
-                    event_vars['C']
-                ).astype(int)
+                    # 1500_metres results have to be converted to seconds
+                    if event_name == '1500_metres':
+                        first_dot = contestant[event_name].find('.')
+                        event_result = \
+                            float(contestant[event_name][0:first_dot]) * 60 +\
+                            float(contestant[event_name][first_dot + 1:])
+                    else:
+                        event_result = float(contestant[event_name])
 
-            print(self.competiton_data)
+                    # track event formula
+                    contestant['points'] += int(
+                        event_vars['A'] *
+                        (event_vars['B'] - event_result) ** event_vars['C']
+                    )
 
-    def order_results(self) -> None:
-        pass
+                # use field event formula to calculate points
+                elif event_vars['event'] == 'field':
+
+                    # some events results have to be converted to cm
+                    event_result = float(contestant[event_name]) * 100 \
+                        if event_vars['convert_units'] \
+                        else float(contestant[event_name])
+
+                    # field event formula
+                    contestant['points'] += int(
+                        event_vars['A'] *
+                        (event_result - event_vars['B']) **
+                        event_vars['C']
+                    )
+
+    def order_and_evaluate_results(self) -> None:
+        self.competiton_data.sort(key=lambda x: x.get('points'), reverse=True)
+
+        # evaluate won positions
+        list_of_points = list(map(lambda x: x['points'], self.competiton_data))
+        for index, competitor in enumerate(self.competiton_data):
+
+            # last competitor who has same amount of points
+            last_same_points = len(list_of_points) - 1 -\
+                list_of_points[::-1].index(competitor['points'])
+
+            # only one competitor takes this place
+            if last_same_points == index:
+                competitor['position'] = str(index + 1)
+            # assign multiple positions
+            else:
+                competitor['position'] =\
+                    f'{list_of_points.index(competitor["points"]) + 1}-'\
+                    f'{last_same_points + 1}'
 
     def export_results(self) -> None:
-        pass
+        jsonified_results = json.dumps(self.competiton_data, indent=4)
+
+        self.write_to_file(jsonified_results)
+
+    def write_to_file(self, text: str) -> None:
+        with open('results.json', 'w') as file:
+            file.write(text)
 
 
 if __name__ == '__main__':
