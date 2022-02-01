@@ -171,10 +171,10 @@ class ResultsSerializer():
 
     def export_to_json(self) -> None:
         """Exports data to json file"""
-        jsonified_results = json.dumps(self.competiton_data, indent=4)
+        json_results = json.dumps(self.competiton_data, indent=4)
 
         with open('results.json', 'w') as file:
-            file.write(jsonified_results)
+            file.write(json_results)
 
 
 if __name__ == '__main__':
