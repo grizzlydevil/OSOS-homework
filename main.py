@@ -3,6 +3,7 @@ import json
 
 
 class ResultsSerializer():
+    """Gets competition data and serializes it to JSON file"""
     input_type = ''
     is_male_competition = True
     competiton_data = {}
@@ -14,13 +15,17 @@ class ResultsSerializer():
         self.is_male_competition = is_male_competition
 
     def defaultCSV(self) -> None:
-        self.get_data()
+        """
+        the process for taking the default file in the same folder as project
+        and exporting to results.json
+        """
+        self.get_data('Decathlon.csv')
         self.calculate_results()
         self.order_and_evaluate_results()
         self.export_to_json()
 
-    def get_data(self, path: str = 'Decathlon.csv') -> None:
-
+    def get_data(self, path: str) -> None:
+        """Get's the data from the source"""
         # mens and womans competition have different events and order
         if self.input_type == 'csv':
             header_names = (
@@ -56,10 +61,11 @@ class ResultsSerializer():
 
                 self.competiton_data = [row for row in reader]
 
-    def validate_data(self) -> None:
-        pass
-
     def calculate_results(self) -> None:
+        """
+        Calculate how many points competitors have won and add it to 
+        competiton_data dictionary
+        """
         POINTS_SYSTEM = {
             '100_metres': {'A': 25.4347, 'B': 18, 'C': 1.81, 'event': 'track',
                            'convert_units': False},
@@ -135,6 +141,10 @@ class ResultsSerializer():
                     )
 
     def order_and_evaluate_results(self) -> None:
+        """
+        Orders the cometitors by place taken and adds won place to 
+        competiton_data dictionary
+        """
         self.competiton_data.sort(key=lambda x: x.get('points'), reverse=True)
 
         # evaluate won positions
@@ -155,6 +165,7 @@ class ResultsSerializer():
                     f'{last_same_points}'
 
     def export_to_json(self) -> None:
+        """Exports data to json file"""
         jsonified_results = json.dumps(self.competiton_data, indent=4)
 
         with open('results.json', 'w') as file:
