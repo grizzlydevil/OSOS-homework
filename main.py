@@ -147,17 +147,22 @@ class ResultsSerializer():
         """
         self.competiton_data.sort(key=lambda x: x.get('points'), reverse=True)
 
-        # evaluate won positions
+        # a list or ordered results
         list_of_points = list(map(lambda x: x['points'], self.competiton_data))
+
+        # evaluate won positions
         for index, competitor in enumerate(self.competiton_data):
+
             # only one competitor takes this place
             if list_of_points.count(competitor['points']) == 1:
                 competitor['position'] = str(index + 1)
+
             # assign multiple positions to competitors with same results
             else:
-                # first competitor place who has same amount of points
+                # first index who has same amount of points
                 first_same_points = list_of_points.index(competitor["points"])
-                # last competitor place who has same amount of points
+
+                # last index place who has same amount of points
                 last_same_points = len(list_of_points) -\
                     list_of_points[::-1].index(competitor['points'])
 
