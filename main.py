@@ -26,8 +26,8 @@ class ResultsSerializer():
 
     def get_data(self, path: str) -> None:
         """Get's the data from the source"""
-        # mens and womans competition have different events and order
         if self.input_type == 'csv':
+            # mens and womans competition have different events and order
             header_names = (
                 'full_name',
                 '100_metres',
