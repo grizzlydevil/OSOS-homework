@@ -3,9 +3,11 @@ import json
 
 
 class CompetitionDataReceiver():
-    """Get's competition data and creates a dict with it"""
+    """
+    Get's competition data and creates a list of competor dicts with it
+    """
     is_male_competition = True
-    competition_data = {}
+    competition_data = []
 
     def __init__(self, is_male_competition: bool) -> None:
         self.is_male_competition = is_male_competition
@@ -48,22 +50,22 @@ class CompetitionDataReceiver():
 
             self.competition_data = [row for row in reader]
 
-    def get_data(self) -> dict:
+    def get_data(self) -> list:
         """returns loaded data as dictionary"""
         return self.competition_data
 
 
 class ResultsProcessor():
     """Calculates and Orders competition data"""
-    competition_data = {}
+    competition_data = []
 
-    def __init__(self, competition_data) -> None:
+    def __init__(self, competition_data: list) -> None:
         self.competition_data = competition_data
 
     def calculate_results(self) -> None:
         """
         Calculate how many points competitors have won and add it to
-        competition_data dictionary
+        athletes dictionary
         """
         POINTS_SYSTEM = {
             '100_metres': {'A': 25.4347, 'B': 18, 'C': 1.81, 'event': 'track',
@@ -142,7 +144,7 @@ class ResultsProcessor():
     def order_and_evaluate_results(self) -> None:
         """
         Orders the cometitors by place taken and adds won place to
-        competition_data dictionary
+        athletes dictionary
         """
         self.competition_data.sort(key=lambda x: x.get('points'), reverse=True)
 
@@ -170,7 +172,7 @@ class ResultsProcessor():
                 competitor['position'] = f'{first_same_points + 1}-' +\
                     f'{last_same_points}'
 
-    def get_processed_results(self) -> dict:
+    def get_processed_results(self) -> list:
         self.calculate_results()
         self.order_and_evaluate_results()
 
@@ -179,12 +181,12 @@ class ResultsProcessor():
 
 class ResultsSerializer():
     """Serializes and exports data"""
-    results = {}
+    results = []
 
     def __init__(self, results) -> None:
         self.results = results
 
-    def export_to_json_file(self, file_name) -> None:
+    def export_to_json_file(self, file_name: str) -> None:
         """Exports data to json file"""
         json_results = json.dumps(self.results, indent=4)
 
