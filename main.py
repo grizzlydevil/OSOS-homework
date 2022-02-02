@@ -2,33 +2,17 @@ import csv
 import json
 
 
-class ResultsSerializer():
-    """Gets competition data and serializes it to JSON file"""
-    input_type = ''
+class CompetitionDataReceiver():
+    """Get's competition data and creates a dict with it"""
     is_male_competition = True
-    competiton_data = {}
+    competition_data = {}
 
-    def __init__(
-        self, input_type: str, is_male_competition: bool = True
-    ) -> None:
-        self.input_type = input_type
+    def __init__(self, is_male_competition: bool) -> None:
         self.is_male_competition = is_male_competition
 
-    def defaultCSV(self) -> None:
-        """
-        the process for taking the default file in the same folder as project
-        and exporting to results.json
-        """
-        self.get_data('Decathlon.csv')
-        self.calculate_results()
-        self.order_and_evaluate_results()
-        self.export_to_json()
-
-    def get_data(self, path: str) -> None:
-        """Get's the data from the source"""
-        if self.input_type == 'csv':
-            # mens and womans competition have different events and order
-            header_names = (
+    def _get_competition_headers(self) -> tuple:
+        """mens and womans competition have different events and order"""
+        return (
                 'full_name',
                 '100_metres',
                 'long_jump',
@@ -54,17 +38,32 @@ class ResultsSerializer():
                 '1500_metres'
             )
 
-            with open(path, mode='r') as file:
-                reader = csv.DictReader(
-                    file, fieldnames=header_names, delimiter=';'
-                )
+    def set_csv_data(self, path: str) -> None:
+        """Sets the competition data from the source"""
+        header_names = self._get_competition_headers()
+        with open(path, mode='r') as file:
+            reader = csv.DictReader(
+                file, fieldnames=header_names, delimiter=';'
+            )
 
-                self.competiton_data = [row for row in reader]
+            self.competition_data = [row for row in reader]
+
+    def get_data(self) -> dict:
+        """returns loaded data as dictionary"""
+        return self.competition_data
+
+
+class ResultsProcessor():
+    """Calculates and Orders competition data"""
+    competition_data = {}
+
+    def __init__(self, competition_data) -> None:
+        self.competition_data = competition_data
 
     def calculate_results(self) -> None:
         """
-        Calculate how many points competitors have won and add it to 
-        competiton_data dictionary
+        Calculate how many points competitors have won and add it to
+        competition_data dictionary
         """
         POINTS_SYSTEM = {
             '100_metres': {'A': 25.4347, 'B': 18, 'C': 1.81, 'event': 'track',
@@ -92,7 +91,7 @@ class ResultsSerializer():
         }
 
         # loop over contestants
-        for contestant in self.competiton_data:
+        for contestant in self.competition_data:
             contestant['points'] = 0
 
             # loop over events
@@ -142,16 +141,18 @@ class ResultsSerializer():
 
     def order_and_evaluate_results(self) -> None:
         """
-        Orders the cometitors by place taken and adds won place to 
-        competiton_data dictionary
+        Orders the cometitors by place taken and adds won place to
+        competition_data dictionary
         """
-        self.competiton_data.sort(key=lambda x: x.get('points'), reverse=True)
+        self.competition_data.sort(key=lambda x: x.get('points'), reverse=True)
 
         # a list or ordered results
-        list_of_points = list(map(lambda x: x['points'], self.competiton_data))
+        list_of_points = list(
+            map(lambda x: x['points'], self.competition_data)
+        )
 
         # evaluate won positions
-        for index, competitor in enumerate(self.competiton_data):
+        for index, competitor in enumerate(self.competition_data):
 
             # only one competitor takes this place
             if list_of_points.count(competitor['points']) == 1:
@@ -169,13 +170,34 @@ class ResultsSerializer():
                 competitor['position'] = f'{first_same_points + 1}-' +\
                     f'{last_same_points}'
 
-    def export_to_json(self) -> None:
-        """Exports data to json file"""
-        json_results = json.dumps(self.competiton_data, indent=4)
+    def get_processed_results(self) -> dict:
+        self.calculate_results()
+        self.order_and_evaluate_results()
 
-        with open('results.json', 'w') as file:
+        return self.competition_data
+
+
+class ResultsSerializer():
+    results = {}
+
+    def __init__(self, results) -> None:
+        self.results = results
+
+    def export_to_json_file(self, file_name) -> None:
+        """Exports data to json file"""
+        json_results = json.dumps(self.results, indent=4)
+
+        with open(file_name, 'w') as file:
             file.write(json_results)
 
 
 if __name__ == '__main__':
-    ResultsSerializer(input_type='csv').defaultCSV()
+    competition_data_receiver = CompetitionDataReceiver(True)
+    competition_data_receiver.set_csv_data('Decathlon.csv')
+    competition_data = competition_data_receiver.get_data()
+
+    results_processor = ResultsProcessor(competition_data)
+    processed_results = results_processor.get_processed_results()
+
+    results_serializer = ResultsSerializer(processed_results)
+    results_serializer.export_to_json_file('res.json')
