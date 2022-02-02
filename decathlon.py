@@ -178,6 +178,7 @@ class ResultsProcessor():
 
 
 class ResultsSerializer():
+    """Serializes and exports data"""
     results = {}
 
     def __init__(self, results) -> None:
