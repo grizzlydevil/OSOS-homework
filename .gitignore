@@ -130,3 +130,5 @@ dmypy.json
 vertinimo kriterijai.txt
 .~lock.Task OSOS Back-end Decathlon.docx#
 res.json
+requirements.txt
+*.json
