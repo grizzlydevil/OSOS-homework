@@ -1,6 +1,6 @@
 from decathlon import export_file_to_json
 
-from flask import flash, render_template, redirect
+from flask import render_template, redirect
 
 from app import app
 from app.forms import ImportFileForm
