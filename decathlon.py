@@ -194,13 +194,17 @@ class ResultsSerializer():
             file.write(json_results)
 
 
-if __name__ == '__main__':
+def export_file_to_json(file: str, exported_file_name: str):
     competition_data_receiver = CompetitionDataReceiver(True)
-    competition_data_receiver.set_csv_data('Decathlon.csv')
+    competition_data_receiver.set_csv_data(file)
     competition_data = competition_data_receiver.get_data()
 
     results_processor = ResultsProcessor(competition_data)
     processed_results = results_processor.get_processed_results()
 
     results_serializer = ResultsSerializer(processed_results)
-    results_serializer.export_to_json_file('res.json')
+    results_serializer.export_to_json_file(exported_file_name)
+
+
+if __name__ == '__main__':
+    export_file_to_json('Decathlon.csv', 'res.json')

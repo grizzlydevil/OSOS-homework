@@ -1,4 +1,4 @@
-import csv
+from decathlon import export_file_to_json
 
 from flask import flash, render_template, redirect
 
@@ -12,6 +12,8 @@ def index():
 
     if form.validate_on_submit():
         uploaded_file = form.file.data
+
+        export_file_to_json(uploaded_file, 'flaskFile.json')
 
         return redirect('/')
 
